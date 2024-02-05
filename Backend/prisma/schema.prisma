@@ -1,0 +1,48 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model user {
+  id       Int      @id @default(autoincrement())
+  Name     String?  @db.VarChar(150)
+  Email    String?  @db.VarChar(150)
+  Role     String?  @db.VarChar(100)
+  Password String?  @db.VarChar(100)
+  salary   salary[]
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model salary {
+  id      Int       @id @default(autoincrement())
+  Date    DateTime? @default(now()) @db.DateTime(0)
+  Amount  Decimal?  @db.Decimal(10, 2)
+  User_ID Int?
+  user    user?     @relation(fields: [User_ID], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "salary_ibfk_1")
+
+  @@index([User_ID], map: "User_ID")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model product_details {
+  id         Int       @id @default(autoincrement())
+  date       DateTime? @default(now()) @db.DateTime(0)
+  company    String?   @db.VarChar(150)
+  quantity   Int?
+  price      Decimal?  @db.Decimal(10, 2)
+  product_id Int?
+  products   products? @relation(fields: [product_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "product_details_ibfk_1")
+
+  @@index([product_id], map: "product_id")
+}
+
+model products {
+  id              Int               @id @default(autoincrement())
+  Product_Name    String?           @db.VarChar(150)
+  Images          String?           @db.Text
+  product_details product_details[]
+}
