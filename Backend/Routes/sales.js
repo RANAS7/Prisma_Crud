@@ -4,9 +4,10 @@ const { PrismaClient } = require("@prisma/client");
 
 const prisma = new PrismaClient();
 
-router.post("/product-details", async (req, res) => {
+router.post("/add-sales", async (req, res) => {
   try {
     let date;
+    let total = req.body.quantity * req.body.price;
 
     if (req.body.date) {
       // If date is provided in the request, use it
@@ -18,19 +19,21 @@ router.post("/product-details", async (req, res) => {
       // If date is not provided, use the current date as the default
       date = new Date();
     }
-    const details = await prisma.product_detail.create({
+    const salesData = await prisma.sales.create({
       data: {
         date: date.toISOString(),
         company: req.body.company,
         quantity: parseInt(req.body.quantity),
         price: parseFloat(req.body.price),
         product_id: parseInt(req.body.selectedProduct),
+        total: total,
+        payment_type: req.body.payment_type,
       },
     });
-    res.json(details);
-    console.log(details);
+    res.json(salesData);
+    console.log(salesData);
   } catch (error) {
-    console.error("Error inserting user with Prisma", error);
+    console.error("Error inserting sales with Prisma", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
